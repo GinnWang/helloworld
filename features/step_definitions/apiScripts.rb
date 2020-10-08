@@ -10,6 +10,7 @@ Given(/^find a proper user and vehicle in auction status$/) do
   @userName='subman'
   puts @userId
   puts @userName
+  puts "sallytest"
 end
 
 
