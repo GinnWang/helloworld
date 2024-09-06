@@ -6,13 +6,13 @@ on:
     branches:
       - "**"  # Trigger for all branches
 env:
-  testimToken: ${{secrets.GITHUB_TOKEN}}
+  testimToken: ${{secrets.TESTIMWEBTOKEN}}
 jobs:
     run-testimio-cli:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v4
-            - run: echo $testimToken
+            - run: echo "Token is $testimToken" 
             - run: npm install -g @testim/testim-cli
             - run: testim --token $testimToken --project "c8ylu6OetLu3Ovnm7RLA" --grid "Testim-Grid" --mode "selenium" --branch "ginnExecution" --label "Demo BLC Login" --parallel 1 --timeout 1200000
