@@ -1,3 +1,5 @@
+# Reference: https://docs.github.com/en/actions/writing-workflows/quickstart
+
 name: Execute Testim smoke Test
 
 on:
