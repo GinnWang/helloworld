@@ -2,14 +2,60 @@ name: Execute Testim smoke Test
 
 on:
   pull_request:
-    types: [opened, synchronize]  # Trigger when a PR is created or updated
+    # types: [opened, synchronize]  # Trigger when a PR is created or updated
+    types: [closed]  # Trigger when a PR is closed
+    # types: [ready_for_review, labeled] # Trigger when a PR is marked as ready for review or labeled
     branches:
-      - "**"  # Trigger for all branches
+      - develop  # Trigger only if the PR is merged into the develop branch
+      - master  # Trigger only if the PR is merged into the develop branch
+      # - "**"  # Trigger for all branches
+
 jobs:
-    run-testimio-cli:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v4
-            - run: npm install -g @testim/testim-cli
-            - run: testim --token ${{ secrets.TESTIMWEBTOKEN }} --project "c8ylu6OetLu3Ovnm7RLA" --grid "Testim-Grid" --mode "selenium" --branch "ginnExecution" --label "Demo BLC Login" --parallel 1 --timeout 1200000
+  run-testimio-cli:
+    if: github.event.pull_request.merged == true  # Ensure the job runs only if the PR was merged. Use this combined with types: [closed]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}  # Checkout the PR branch. Not required if use types: [opened, synchronize] 
+
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'  # Specify Node.js version. Or remove this line to use latest version
+
+      - name: Cache Node.js Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # - name: Install Dependencies
+      #   run: npm install
+      #   continue-on-error: true
+
+      - name: Install Testim CLI
+        run: npm install -g @testim/testim-cli
+
+      - name: Run Testim Smoke Tests
+        run: |
+          echo "Running Testim Smoke Tests..."
+          testim --token ${{ secrets.TESTIMWEBTOKEN }} \
+                 --project "c8ylu6OetLu3Ovnm7RLA" \
+                 --grid "Testim-Grid" \
+                 --mode "selenium" \
+                 --branch "ginnExecution" \
+                 --label "Demo BLC Login" \
+                 --parallel 1 \
+                 --timeout 1200000
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: testim-results
+          path: ./testim-results.xml  # Adjust the path if needed
