@@ -13,6 +13,7 @@ on:
 jobs:
   run-testimio-cli:
     if: github.event.pull_request.merged == true  # Ensure the job runs only if the PR was merged. Use this combined with types: [closed]
+    # if: contains(github.event.label.name, 'my-specific-label') # if you want to trigger the workflow when PR is labeled with a specific label
     runs-on: ubuntu-latest
 
     steps:
