@@ -4,8 +4,8 @@ name: Execute Testim smoke Test
 
 on:
   pull_request:
-    # types: [opened, synchronize]  # Trigger when a PR is created or updated
-    types: [closed]  # Trigger when a PR is closed
+    types: [opened, synchronize]  # Trigger when a PR is created or updated
+    # types: [closed]  # Trigger when a PR is closed
     # types: [ready_for_review, labeled] # Trigger when a PR is marked as ready for review or labeled
     branches:
       - develop  # Trigger only if the PR is merged into the develop branch
@@ -14,7 +14,7 @@ on:
 
 jobs:
   run-testimio-cli:
-    if: github.event.pull_request.merged == true  # Ensure the job runs only if the PR was merged. Use this combined with types: [closed]
+    # if: github.event.pull_request.merged == true  # Ensure the job runs only if the PR was merged. Use this combined with types: [closed]
     # if: contains(github.event.label.name, 'my-specific-label') # if you want to trigger the workflow when PR is labeled with a specific label
     runs-on: ubuntu-latest
 
