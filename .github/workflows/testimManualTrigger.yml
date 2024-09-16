@@ -4,6 +4,32 @@ name: Testim Manual Trigger
 
 on:
   workflow_dispatch:
+    inputs:
+        testim-base-url: 
+            description: provide base URL for the test cases
+            required: false
+            type: string
+            default: https://demo.openlane.dev
+        testim-branch: 
+            description: specify branch to be executed
+            required: true
+            type: string
+            default: ginnExecution
+        testim-grouping-type: 
+            description: specify test group type in Testim
+            required: false
+            type: string
+            default: label
+        testim-asset-name: 
+            description: label name, suite name or test plan name
+            required: true
+            type: string
+            default: Demo BLC Login
+        testim-data: 
+            description: test data file
+            required: false
+            type: string
+            default: automation/cypress/fixtures/e2e/test.json
 
 jobs:
   run-testimio-cli:
@@ -12,7 +38,7 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-        
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -36,8 +62,8 @@ jobs:
                  --project "c8ylu6OetLu3Ovnm7RLA" \
                  --grid "Testim-Grid" \
                  --mode "selenium" \
-                 --branch "ginnExecution" \
-                 --label "Demo BLC Login" \
+                 --branch ${{ inputs.testim-branch }} \
+                 --label ${{ inputs.testim-asset-name }} \
                  --parallel 1 \
                  --timeout 1200000
 
