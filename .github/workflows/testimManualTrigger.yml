@@ -1,0 +1,48 @@
+# Reference: https://docs.github.com/en/actions/writing-workflows/quickstart
+
+name: Testim Manual Trigger
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-testimio-cli:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'  # Specify Node.js version. Or remove this line to use latest version
+
+      - name: Cache Node.js Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Testim CLI
+        run: npm install -g @testim/testim-cli
+
+      - name: Run Testim Smoke Tests
+        run: |
+          echo "Running Testim Smoke Tests..."
+          testim --token ${{ secrets.TESTIMWEBTOKEN }} \
+                 --project "c8ylu6OetLu3Ovnm7RLA" \
+                 --grid "Testim-Grid" \
+                 --mode "selenium" \
+                 --branch "ginnExecution" \
+                 --label "Demo BLC Login" \
+                 --parallel 1 \
+                 --timeout 1200000
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: testim-results
+          path: ./testim-results.xml  # Adjust the path if needed
