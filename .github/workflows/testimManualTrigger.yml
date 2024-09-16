@@ -1,29 +1,43 @@
 # Reference: https://docs.github.com/en/actions/writing-workflows/quickstart
 
-name: Execute Testim smoke Test
+name: Testim Manual Trigger
 
 on:
-  pull_request:
-    types: [opened, synchronize]  # Trigger when a PR is created or updated
-    # types: [closed]  # Trigger when a PR is closed
-    # types: [ready_for_review, labeled] # Trigger when a PR is marked as ready for review or labeled
-    branches:
-      - develop  # Trigger only if the PR is merged into the develop branch
-      - master  # Trigger only if the PR is merged into the develop branch
-      # - "**"  # Trigger for all branches
+  workflow_dispatch:
+    inputs:
+        testim-base-url: 
+            description: provide base URL for the test cases
+            required: false
+            type: string
+            default: https://demo.openlane.dev
+        testim-branch: 
+            description: specify branch to be executed
+            required: true
+            type: string
+            default: ginnExecution
+        testim-grouping-type: 
+            description: specify test group type in Testim
+            required: false
+            type: string
+            default: label
+        testim-asset-name: 
+            description: label name, suite name or test plan name
+            required: true
+            type: string
+            default: Demo BLC Login
+        testim-data: 
+            description: test data file
+            required: false
+            type: string
+            default: automation/cypress/fixtures/e2e/test.json
 
 jobs:
   run-testimio-cli:
-    # if: github.event.pull_request.merged == true  # Ensure the job runs only if the PR was merged. Use this combined with types: [closed]
-    # if: contains(github.event.label.name, 'my-specific-label') # if you want to trigger the workflow when PR is labeled with a specific label
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}  # Checkout the PR branch. Not required if use types: [opened, synchronize] 
-
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -38,10 +52,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # - name: Install Dependencies
-      #   run: npm install
-      #   continue-on-error: true
-
       - name: Install Testim CLI
         run: npm install -g @testim/testim-cli
 
@@ -52,8 +62,8 @@ jobs:
                  --project "c8ylu6OetLu3Ovnm7RLA" \
                  --grid "Testim-Grid" \
                  --mode "selenium" \
-                 --branch "ginnExecution" \
-                 --label "Demo BLC Login" \
+                 --branch ${{ inputs.testim-branch }} \
+                 --label ${{ inputs.testim-asset-name }} \
                  --parallel 1 \
                  --timeout 1200000
 
