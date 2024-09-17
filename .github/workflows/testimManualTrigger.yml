@@ -15,7 +15,7 @@ on:
             required: true
             type: string
             default: ginnExecution
-        testim-grouping-type: 
+        testim-group-type: 
             description: specify test group type in Testim
             required: false
             type: string
@@ -25,11 +25,11 @@ on:
             required: true
             type: string
             default: Demo BLC Login
-        testim-data: 
-            description: test data file
-            required: false
-            type: string
-            default: automation/cypress/fixtures/e2e/test.json
+        # testim-data: 
+        #     description: test data file
+        #     required: false
+        #     type: string
+        #     default: automation/cypress/fixtures/e2e/test.json
 
 jobs:
   run-testimio-cli:
@@ -63,7 +63,8 @@ jobs:
                  --grid "Testim-Grid" \
                  --mode "selenium" \
                  --branch ${{ inputs.testim-branch }} \
-                 --label ${{ inputs.testim-asset-name }} \
+                 --${{ inputs.testim-group-type }} ${{ inputs.testim-asset-name }} \
+                 --base-url ${{ inputs.testim-base-url}}  \
                  --parallel 1 \
                  --timeout 1200000
 
