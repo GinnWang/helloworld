@@ -59,9 +59,11 @@ jobs:
                  --timeout 1200000
       - name: List Directory Contents
         run: ls
+        continue-on-error: true
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
         with:
           name: testim-results
           path: ./results.xml  # Adjust the path if needed
+        continue-on-error: true
