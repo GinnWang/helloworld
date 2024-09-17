@@ -1,35 +1,28 @@
-# Reference: https://docs.github.com/en/actions/writing-workflows/quickstart
-
 name: Testim Manual Trigger
 
 on:
   workflow_dispatch:
     inputs:
-        testim-base-url: 
-            description: provide base URL for the test cases
-            required: false
-            type: string
-            default: https://demo.openlane.dev
-        testim-branch: 
-            description: specify branch to be executed
-            required: true
-            type: string
-            default: ginnExecution
-        testim-grouping-type: 
-            description: specify test group type in Testim
-            required: false
-            type: string
-            default: label
-        testim-asset-name: 
-            description: label name, suite name or test plan name
-            required: true
-            type: string
-            default: Demo BLC Login
-        testim-data: 
-            description: test data file
-            required: false
-            type: string
-            default: automation/cypress/fixtures/e2e/test.json
+      testim-base-url: 
+        description: provide base URL for the test cases
+        required: false
+        type: string
+        default: https://demo.openlane.dev
+      testim-branch: 
+        description: specify branch to be executed
+        required: true
+        type: string
+        default: ginnExecution
+      testim-group-type: 
+        description: specify test group type in Testim
+        required: false
+        type: string
+        default: label
+      testim-asset-name: 
+        description: label name, suite name or test plan name
+        required: true
+        type: string
+        default: Demo BLC Login
 
 jobs:
   run-testimio-cli:
@@ -37,12 +30,12 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'  # Specify Node.js version. Or remove this line to use latest version
+          node-version: '20'
 
       - name: Cache Node.js Modules
         uses: actions/cache@v3
@@ -62,8 +55,9 @@ jobs:
                  --project "c8ylu6OetLu3Ovnm7RLA" \
                  --grid "Testim-Grid" \
                  --mode "selenium" \
-                 --branch ${{ inputs.testim-branch }} \
-                 --label ${{ inputs.testim-asset-name }} \
+                 --branch "${{ github.event.inputs.testim-branch }}" \
+                 --${{ github.event.inputs.testim-group-type }} "${{ github.event.inputs.testim-asset-name }}" \
+                 --base-url "${{ github.event.inputs.testim-base-url }}"  \
                  --parallel 1 \
                  --timeout 1200000
 
@@ -71,4 +65,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: testim-results
-          path: ./testim-results.xml  # Adjust the path if needed
+          path: ./testim-results.xml

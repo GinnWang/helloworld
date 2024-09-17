@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}  # Checkout the PR branch. Not required if use types: [opened, synchronize] 
 
@@ -28,7 +28,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'  # Specify Node.js version. Or remove this line to use latest version
+          node-version: '20'  # Specify Node.js version. Or remove this line to use latest version
 
       - name: Cache Node.js Modules
         uses: actions/cache@v3
