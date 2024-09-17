@@ -55,7 +55,10 @@ jobs:
                  --branch "ginnExecution" \
                  --label "Demo BLC Login" \
                  --parallel 1 \
+                 --report-file ./testim/results.xml
                  --timeout 1200000
+      - name: List Directory Contents
+        run: ls -al ./testim
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
