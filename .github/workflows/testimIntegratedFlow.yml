@@ -55,8 +55,8 @@ jobs:
                  --branch "ginnExecution" \
                  --label "Demo BLC Login" \
                  --parallel 1 \
-                 --report-file ./results.xml \
-                 --timeout 1200000
+                 --timeout 1200000 \
+                 --report-file ./results.xml 
         continue-on-error: true
       - name: List Directory Contents
         run: ls
