@@ -53,9 +53,9 @@ jobs:
                  --parallel 1 \
                  --timeout 1200000 \
                  --report-file ./results.xml 
-        continue-on-error: true
 
       - name: Upload Test Results
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: testim-results
