@@ -3,9 +3,17 @@ name: Testim Manual Trigger
 on:
   workflow_dispatch:
     inputs:
+      testim-test-environment:
+        description: define test environment
+        required: true
+        type: choice
+        options:
+          - demo
+          - e2e
+        default: demo
       testim-base-url: 
         description: provide base URL for the test cases
-        required: false
+        required: true
         type: string
         default: https://demo.openlane.dev
       testim-branch: 
@@ -15,7 +23,7 @@ on:
         default: ginnExecution
       testim-group-type: 
         description: specify test group type in Testim
-        required: false
+        required: true
         type: string
         default: label
       testim-asset-name: 
@@ -23,14 +31,28 @@ on:
         required: true
         type: string
         default: Demo BLC Login
+      code-branch:
+        description: specify the code branch to check out
+        required: true
+        type: string
+        default: develop
 
 jobs:
-  run-testimio-cli:
+  build-e2e-environment:
+    if: github.event.inputs.testim-test-environment == 'e2e' 
     runs-on: ubuntu-latest
 
     steps:
+      - name: echo environment
+        run: echo "Running test in e2e environment"
+
+  common-setup:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.code-branch }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -48,6 +70,11 @@ jobs:
       - name: Install Testim CLI
         run: npm install -g @testim/testim-cli
 
+  run-testim-test-in-e2e-env:
+    runs-on: ubuntu-latest
+    needs: [build-e2e-environment, common-setup]  
+
+    steps:
       - name: Run Testim Smoke Tests
         run: |
           echo "Running Testim Smoke Tests..."
@@ -60,11 +87,41 @@ jobs:
                  --base-url "${{ github.event.inputs.testim-base-url }}"  \
                  --parallel 1 \
                  --timeout 1200000 \
-                 --report-file ./results.xml
-        continue-on-error: true
+                 --report-file ./results-e2e.xml
 
       - name: Upload Test Results
+        if: always() # This ensures the upload happens even if the test fails
         uses: actions/upload-artifact@v3
         with:
           name: testim-results
-          path: ./testim-results.xml
+          path: ./results-e2e.xml
+          
+  run-testim-test-in-demo-env:
+    if: github.event.inputs.testim-test-environment == 'demo' 
+    runs-on: ubuntu-latest
+    needs: common-setup
+
+    steps:
+      - name: echo environment
+        run: echo "Running test in demo environment"
+
+      - name: Run Testim Smoke Tests
+        run: |
+          echo "Running Testim Smoke Tests..."
+          testim --token ${{ secrets.TESTIMWEBTOKEN }} \
+                 --project "c8ylu6OetLu3Ovnm7RLA" \
+                 --grid "Testim-Grid" \
+                 --mode "selenium" \
+                 --branch "${{ github.event.inputs.testim-branch }}" \
+                 --${{ github.event.inputs.testim-group-type }} "${{ github.event.inputs.testim-asset-name }}" \
+                 --base-url "${{ github.event.inputs.testim-base-url }}"  \
+                 --parallel 1 \
+                 --timeout 1200000 \
+                 --report-file ./results-demo.xml
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: testim-results
+          path: ./results-demo.xml
