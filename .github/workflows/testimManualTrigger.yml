@@ -59,7 +59,9 @@ jobs:
                  --${{ github.event.inputs.testim-group-type }} "${{ github.event.inputs.testim-asset-name }}" \
                  --base-url "${{ github.event.inputs.testim-base-url }}"  \
                  --parallel 1 \
-                 --timeout 1200000
+                 --timeout 1200000 \
+                 --report-file ./results.xml
+        continue-on-error: true
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
