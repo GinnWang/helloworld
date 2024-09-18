@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       testim-test-environment:
-        description: define test environment
+        description: Test environment
         required: true
         type: choice
         options:
@@ -12,27 +12,31 @@ on:
           - e2e
         default: demo
       testim-base-url: 
-        description: provide base URL for the test cases
+        description: Testim Base URL
         required: true
         type: string
         default: https://demo.openlane.dev
       testim-branch: 
-        description: specify branch to be executed
+        description: Testim Branch
         required: true
         type: string
         default: ginnExecution
       testim-group-type: 
-        description: specify test group type in Testim
+        description: Testim Group type
         required: true
-        type: string
+        type: choice
+        options:
+          - label
+          - suite
+          - test-plan
         default: label
       testim-asset-name: 
-        description: label name, suite name or test plan name
+        description: Testim Group name
         required: true
         type: string
         default: Demo BLC Login
       code-branch:
-        description: specify the code branch to check out
+        description: Project Code Branch 
         required: true
         type: string
         default: develop
