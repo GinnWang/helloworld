@@ -38,10 +38,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # - name: Install Dependencies
-      #   run: npm install
-      #   continue-on-error: true
-
       - name: Install Testim CLI
         run: npm install -g @testim/testim-cli
 
@@ -58,8 +54,7 @@ jobs:
                  --timeout 1200000 \
                  --report-file ./results.xml 
         continue-on-error: true
-      - name: List Directory Contents
-        run: ls
+
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
         with:
